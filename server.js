@@ -12,9 +12,12 @@ const normalizePort = val => {
   }
   return false;
 };
-const port = normalizePort(process.env.PORT || '3000');
+
+// Server execute on port 3001 if any other environment is set
+const port = normalizePort(process.env.PORT || '4000');
 app.set('port', port);
 
+// Error handling
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
     throw error;
