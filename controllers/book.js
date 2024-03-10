@@ -84,36 +84,34 @@ exports.getAllBooks = (req, res, next) => {
 
 // POST
 exports.rateBook = async (req, res, next) => {
-    try {
-        const ratingObject = { ...req.body, grade: req.body.rating };
-        const book = await Book.findOne({ _id: req.params.id });
+  try {
+      const { rating } = req.body;
 
-        if (!book) {
-            return res.status(404).json({ message: 'Book not found' });
-        }
+      if (typeof rating !== 'number' || rating < 0 || rating > 5) {
+          return res.status(400).json({ message: 'Grade must be a number between 0 and 5' });
+      }
 
-        const userIdArray = book.ratings.map(rating => rating.userId);
-        if (userIdArray.includes(req.auth.userId)) {
-            return res.status(403).json({ message: 'User has already rated this book' });
-        }
+      const book = await Book.findByIdAndUpdate(
+          req.params.id,
+          { $push: { ratings: { grade: rating, userId: req.auth.userId } } },
+          { new: true }
+      );
 
-        if (!(req.body.rating >= 0) || !(req.body.rating <= 5) || (typeof req.body.rating !== 'number')) {
-            return res.status(400).json({ message: 'Grade is not between 0 and 5 included or is not a number' });
-        }
+      if (!book) {
+          return res.status(404).json({ message: 'Book not found' });
+      }
 
-        book.ratings.push(ratingObject);
-        const grades = book.ratings.map(rating => rating.grade);
-        const averageGrades = average(grades);
+      const grades = book.ratings.map(rating => rating.grade);
+      const averageGrades = grades.reduce((sum, grade) => sum + grade, 0) / grades.length;
+      book.averageRating = averageGrades;
 
-        book.averageRating = averageGrades;
+      await book.save();
 
-        await book.save();
-
-        res.status(200).json(book);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'An error has occurred' });
-    }
+      res.status(200).json(book);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'An error has occurred' });
+  }
 };
 
 // POST
@@ -127,4 +125,3 @@ exports.getBestRating = (req, res, next) => {
             res.status(500).json({ error: error.message });
         });
 };
-

@@ -39,7 +39,7 @@ module.exports.resizeImage = (req, res, next) => {
   const outputFilePath = path.join('images', `resized_${fileName}`);
 
   sharp(filePath)
-    .resize({ width: 206, height: 260 })
+    .resize({ width: 206, height: 300 })
     .toFile(outputFilePath)
     .then(() => {
       // Remplacer le fichier original par le fichier redimensionné
