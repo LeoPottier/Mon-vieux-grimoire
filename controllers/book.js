@@ -36,7 +36,6 @@ exports.modifyBook = (req, res, next) => {
             if (book.userId != req.auth.userId) {
                 res.status(403).json({ message : '403: unauthorized request' });
             } else {
-                // Séparation du nom du fichier image existant
                 const filename = book.imageUrl.split('/images/')[1];
                 // Si l'image a été modifiée, on supprime l'ancienne
                 req.file && fs.unlink(`images/${filename}`, (err => {
