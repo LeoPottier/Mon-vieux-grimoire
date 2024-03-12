@@ -8,7 +8,7 @@ const path = require('path');
 console.log(process.env)
 
 // Connection to DataBase MongoDB
-mongoose.connect(`mongodb+srv://leopottier:Q2J19iKi0zPlQv0K@cluster.a00vtes.mongodb.net/?retryWrites=true&w=majority&appName=Cluster`,
+mongoose.connect(process.env.DB_URI,
   { 
     useNewUrlParser: true,
     useUnifiedTopology: true })
